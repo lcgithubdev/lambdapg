@@ -16,12 +16,12 @@ assignmentCommentsRouter.post('/getcomment', auth, accessUser, assignmentComment
 
 assignmentCommentsRouter.post('/getcomments', auth, accessUser, assignmentCommentsController.getComments);
 
-assignmentCommentsRouter.get('/createtable', auth, accessUser, assignmentCommentsController.createTable);
+//assignmentCommentsRouter.get('/createtable', auth, accessUser, assignmentCommentsController.createTable);
 
 //assignmentCommentsRouter.get('/droptable', auth, accessUser, assignmentCommentsController.dropTable);
 
 //assignmentCommentsRouter.post('/getkey', auth, accessUser, assignmentCommentsController.getKey);
 
-assignmentCommentsRouter.get('/test', assignmentCommentsController.test);
+//assignmentCommentsRouter.get('/test', assignmentCommentsController.test);
 
 export default assignmentCommentsRouter
