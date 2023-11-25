@@ -2,11 +2,11 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-import postgres from "postgres"
+import postgres from "postgres";
 
 const sql = postgres(process.env.DATABASE_URL as string,
     {
-        ssl: true,
+        ssl: false,
         max: 10,
         max_lifetime: 60 * 30,
         idle_timeout: 60 * 10,

@@ -112,7 +112,7 @@ class AssignmentCommentsController {
 
             if (result.length === 0) return c.json({ error: true, data: "No assignment comment found!" });
 
-            return c.json({ error: false, data: result.rows });
+            return c.json({ error: false, data: result });
 
         } catch (error) {
 
@@ -229,7 +229,9 @@ class AssignmentCommentsController {
             const createTable = await sql`ALTER TABLE IF EXISTS public.assignmentcomments
                     OWNER to "uanqu6cks7twvs2r53ja"`;
 
-            return c.json({ error: false, data: `Table assignmentcomments created successfully!`, dropTable, createTableawait, createTable, });
+                    const a = await sql`SELECT * FROM pg_catalog.pg_tables;`
+
+            return c.json({ error: false, data: `Table assignmentcomments created successfully!`, dropTable, createTableawait, createTable,a });
 
         } catch (error) {
 
