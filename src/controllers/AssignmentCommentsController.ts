@@ -8,17 +8,13 @@ import * as jose from "jose";
 
 import sql from "../config/dbConfig";
 
-//import pool from "../config/dbConfig";
-
 import crypt from "../helpers/crypt";
-
-
 
 class AssignmentCommentsController {
     sql: any
     constructor() {
 
-        
+
     }
 
     addComment = async (c: any) => {
@@ -50,23 +46,13 @@ class AssignmentCommentsController {
 
             const date = new Date().getTime();
 
-            const client = await pool.connect();
+            const result = await sql`SELECT comment_id, website_name FROM assignmentcomments WHERE assignment_id = ${assignment_id} AND user_id = ${user_id} AND website_name = ${website_name}`;
 
-            const result = await client.query(`SELECT comment_id, website_name FROM assignmentcomments WHERE assignment_id = $1 AND user_id = $2 AND website_name = $3`, [assignment_id, user_id, website_name]);
+            if(result.length !== 0) return c.json({ error: true, data: 'Assignment comment aleady exist!' });
 
-            if (result.rows.length !== 0) {
-                await client.query(`UPDATE assignmentcomments SET comment = $1 WHERE assignment_id = $2 AND user_id = $3 AND website_name = $4`, [comment, assignment_id, user_id, website_name]);
-                client.release();
-                return c.json({ error: false, data: 'Assignment comment added successfully!', comment_id: result.rows[0]?.comment_id });
-            }
+            const resultRows = await sql`INSERT INTO public.assignmentcomments (comment_id, assignment_id, user_id, comment, website_name) VALUES (${date}, ${assignment_id}, ${user_id}, ${comment}, ${website_name})`;
 
-            const resultRows = await client.query(`INSERT INTO public.assignmentcomments (comment_id, assignment_id, user_id, comment, website_name) VALUES ($1, $2, $3, $4, $5)`, [date, assignment_id, user_id, comment, website_name]);
-
-            console.log(resultRows)
-
-            if (resultRows.rowCount == 0) return c.json({ error: true, data: "Unable to add assignment comment!" });
-
-            client.release();
+            if(resultRows.count === 0 ) return c.json({ error: true, data: 'Unable to add assignment comment!' });
 
             return c.json({ error: false, data: 'Assignment comment added successfully!', comment_id: date });
 
@@ -122,13 +108,9 @@ class AssignmentCommentsController {
 
             zodObj.parse(reqBodyData);
 
-            const client = await pool.connect();
-
-            const result: any = await client.query("SELECT * FROM assignmentcomments WHERE assignment_id = $1 AND website_name = $2 OFFSET $3 LIMIT $4", [assignment_id, website_name, offset, limit]);
+            const result: any = await sql`SELECT * FROM assignmentcomments WHERE assignment_id = ${assignment_id} AND website_name = ${website_name} OFFSET ${offset} LIMIT ${limit}`;
 
             if (result.rowCount == 0) return c.json({ error: true, data: "No assignment comment found!" });
-
-            client.release();
 
             return c.json({ error: false, data: result.rows });
 
@@ -186,15 +168,11 @@ class AssignmentCommentsController {
 
             zodObj.parse(reqBodyData);
 
-            const client = await pool.connect();
-
-            const result: any = await client.query("SELECT * FROM assignmentcomments WHERE assignment_id IN ($1) AND website_name = $2 OFFSET $3 LIMIT $4", [assignment_ids, website_name, offset, limit]);
-
-            client.release();
+            const result: any = await sql`SELECT * FROM assignmentcomments WHERE assignment_id IN (${assignment_ids}) AND website_name = ${website_name} OFFSET ${offset} LIMIT ${limit}`;
 
             if (result.rowCount == 0) return c.json({ error: true, data: "No assignment comment found!" });
 
-            return c.json({ error: false, data: result.rows });
+            return c.json({ error: false, data: result });
 
         } catch (error) {
 
@@ -230,11 +208,9 @@ class AssignmentCommentsController {
 
         try {
 
-            const client = await pool.connect();
+            const dropTable = await sql`DROP TABLE IF EXISTS public.assignmentcomments`;
 
-            await client.query(`DROP TABLE IF EXISTS public.assignmentcomments`, []);
-
-            await client.query(`
+            const createTableawait = await sql`
 
             CREATE TABLE IF NOT EXISTS public.assignmentcomments
             (
@@ -248,14 +224,12 @@ class AssignmentCommentsController {
                 "deleted_at" timestamp NULL,
                 "website_name" text COLLATE pg_catalog."default" NULL
             )
-            TABLESPACE pg_default;
-            
-            ALTER TABLE IF EXISTS public.assignmentcomments
-                OWNER to lcgithub`, []);
+            TABLESPACE pg_default;`;
 
-            client.release();
+            const createTable = await sql`ALTER TABLE IF EXISTS public.assignmentcomments
+                    OWNER to lcgithub`;
 
-            return c.json({ error: false, data: `Table assignmentcomments created successfully!` });
+            return c.json({ error: false, data: `Table assignmentcomments created successfully!`, dropTable, createTableawait, createTable, });
 
         } catch (error) {
 
@@ -291,13 +265,9 @@ class AssignmentCommentsController {
 
         try {
 
-            const client = await pool.connect();
+            const dropTable = await sql`DROP TABLE IF EXISTS public.assignmentcomments`;
 
-            await client.query(`DROP TABLE IF EXISTS public.assignmentcomments`, []);
-
-            client.release();
-
-            return c.json({ error: false, data: `Table assignmentcomments deleted successfully!` });
+            return c.json({ error: false, data: `Table assignmentcomments deleted successfully!`, dropTable });
 
         } catch (error) {
 
@@ -442,7 +412,7 @@ class AssignmentCommentsController {
             console.log(a)
 
 
-            return c.json({ error: false, data: result, a  });
+            return c.json({ error: false, data: result, a });
 
         } catch (error) {
 
