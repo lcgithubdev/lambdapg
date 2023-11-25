@@ -7,8 +7,6 @@ import * as jose from "jose";
 
 import crypt from "../helpers/crypt";
 
-import sql from "../config/dbConfig";
-
 const auth = async (c: any, next: () => any) => {
 
   const authHeader = await c.req.header('authorization');
@@ -20,8 +18,6 @@ const auth = async (c: any, next: () => any) => {
   const token = crypt.decrypt(authHeader.split(" ")[1]);
 
   try {
-
-    const result = sql`SELECT * FROM `
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
