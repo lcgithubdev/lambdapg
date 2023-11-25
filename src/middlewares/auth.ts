@@ -7,7 +7,7 @@ import * as jose from "jose";
 
 import crypt from "../helpers/crypt";
 
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+import sql from "../config/dbConfig";
 
 const auth = async (c: any, next: () => any) => {
 
@@ -21,11 +21,13 @@ const auth = async (c: any, next: () => any) => {
 
   try {
 
-    const secret = new TextEncoder().encode(JWT_SECRET_KEY);
+    const result = sql`SELECT * FROM `
+
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
     const jwtVerifyData = await jose.jwtVerify(token, secret, {
-      issuer: 'greattutor.org',
-      audience: 'greattutor.org',
+      issuer: process.env.ISSUER,
+      audience: process.env.AUDIENCE,
     });
 
     const payload: any = jwtVerifyData.payload;

@@ -110,7 +110,7 @@ class AssignmentCommentsController {
 
             const result: any = await sql`SELECT * FROM assignmentcomments WHERE assignment_id = ${assignment_id} AND website_name = ${website_name} OFFSET ${offset} LIMIT ${limit}`;
 
-            if (result.rowCount == 0) return c.json({ error: true, data: "No assignment comment found!" });
+            if (result.length === 0) return c.json({ error: true, data: "No assignment comment found!" });
 
             return c.json({ error: false, data: result.rows });
 
@@ -170,7 +170,7 @@ class AssignmentCommentsController {
 
             const result: any = await sql`SELECT * FROM assignmentcomments WHERE assignment_id IN (${assignment_ids}) AND website_name = ${website_name} OFFSET ${offset} LIMIT ${limit}`;
 
-            if (result.rowCount == 0) return c.json({ error: true, data: "No assignment comment found!" });
+            if (result.length === 0) return c.json({ error: true, data: "No assignment comment found!" });
 
             return c.json({ error: false, data: result });
 
@@ -227,7 +227,7 @@ class AssignmentCommentsController {
             TABLESPACE pg_default;`;
 
             const createTable = await sql`ALTER TABLE IF EXISTS public.assignmentcomments
-                    OWNER to lcgithub`;
+                    OWNER to "uanqu6cks7twvs2r53ja"`;
 
             return c.json({ error: false, data: `Table assignmentcomments created successfully!`, dropTable, createTableawait, createTable, });
 
@@ -391,26 +391,10 @@ class AssignmentCommentsController {
 
         try {
 
-            // const reqBody = await c.req.json();
-
-            // const email = reqBody.email;
-
-            // const reqBodyData = { email }
-
-            // const zodObj = zod.object({
-
-            //     email: zod.string(),
-            // });
-
-            //zodObj.parse(reqBodyData);
-
             const result = await sql`SELECT NOW()`;
 
             const a = await sql`SELECT pid, usename, state
             FROM pg_stat_activity;`
-
-            console.log(a)
-
 
             return c.json({ error: false, data: result, a });
 
