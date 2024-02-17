@@ -6,7 +6,7 @@ import zod from "zod";
 
 import * as jose from "jose";
 
-import sql from "../config/dbConfig";
+import pool from "../config/dbConfig";
 
 import crypt from "../helpers/crypt";
 
@@ -208,9 +208,10 @@ class AssignmentCommentsController {
 
         try {
 
-            const dropTable = await sql`DROP TABLE IF EXISTS public.assignmentcomments`;
+            const client = await pool.connect();
 
-            const createTableawait = await sql`
+            const createTableawait = await client.query(`
+            DROP TABLE IF EXISTS public.assignmentcomments;
 
             CREATE TABLE IF NOT EXISTS public.assignmentcomments
             (
@@ -224,14 +225,14 @@ class AssignmentCommentsController {
                 "deleted_at" timestamp NULL,
                 "website_name" text COLLATE pg_catalog."default" NULL
             )
-            TABLESPACE pg_default;`;
+            TABLESPACE pg_default;
+            
+            ALTER TABLE IF EXISTS public.assignmentcomments
+                    OWNER to "postgres"`);
 
-            const createTable = await sql`ALTER TABLE IF EXISTS public.assignmentcomments
-                    OWNER to "uanqu6cks7twvs2r53ja"`;
+                    //const a = await client.query(`SELECT * FROM pg_catalog.pg_tables;`)
 
-                    const a = await sql`SELECT * FROM pg_catalog.pg_tables;`
-
-            return c.json({ error: false, data: `Table assignmentcomments created successfully!`, dropTable, createTableawait, createTable,a });
+            return c.json({ error: false, data: `Table assignmentcomments created successfully!`, createTableawait });
 
         } catch (error) {
 

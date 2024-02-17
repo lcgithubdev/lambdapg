@@ -16,7 +16,7 @@ assignmentCommentsRouter.post('/getcomment', auth, accessUser, assignmentComment
 
 assignmentCommentsRouter.post('/getcomments', auth, accessUser, assignmentCommentsController.getComments);
 
-//assignmentCommentsRouter.get('/createtable', auth, accessUser, assignmentCommentsController.createTable);
+assignmentCommentsRouter.get('/createtable',  assignmentCommentsController.createTable);
 
 //assignmentCommentsRouter.get('/droptable', auth, accessUser, assignmentCommentsController.dropTable);
 
